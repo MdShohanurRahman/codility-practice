@@ -8,7 +8,7 @@ import java.util.Set;
  * Day 1 - Problem 4: Contains Duplicate
  * Question: Determine whether an integer array contains any duplicate value.
  */
-public class Problem4_ContainsDuplicate {
+public class Problem04_ContainsDuplicate {
 
     // ==========================================
     // 1. BRUTE FORCE APPROACH (Nested Loops)

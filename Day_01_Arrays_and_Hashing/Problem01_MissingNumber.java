@@ -6,7 +6,7 @@ import java.util.Arrays;
  * Day 1 - Problem 1: Missing Number
  * Question: Given an array containing N distinct numbers from 0 to N, find the missing number.
  */
-public class Problem1_MissingNumber {
+public class Problem01_MissingNumber {
 
     // ==========================================
     // 1. BRUTE FORCE APPROACH (Sorting)

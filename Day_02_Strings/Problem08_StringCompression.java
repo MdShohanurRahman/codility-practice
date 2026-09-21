@@ -5,7 +5,7 @@ package Day_02_Strings;
  * Question: Compress consecutive repeated characters.
  * Example: "aaabbc" -> "a3b2c1"
  */
-public class Problem8_StringCompression {
+public class Problem08_StringCompression {
 
     // ==========================================
     // 1. BRUTE FORCE / NAIVE APPROACH (String Concatenation in Loop)

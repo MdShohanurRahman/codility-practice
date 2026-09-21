@@ -5,7 +5,7 @@ package Day_02_Strings;
  * Question: Return the character with the highest frequency in a string.
  * Tie-breaking rule: Return the first character in the string that achieves the maximum frequency.
  */
-public class Problem7_CharacterFrequency {
+public class Problem07_CharacterFrequency {
 
     // ==========================================
     // 1. BRUTE FORCE APPROACH (Nested Loops)

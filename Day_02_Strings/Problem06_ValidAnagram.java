@@ -6,7 +6,7 @@ import java.util.Arrays;
  * Day 2 - Problem 6: Valid Anagram
  * Question: Determine whether two strings are anagrams of each other.
  */
-public class Problem6_ValidAnagram {
+public class Problem06_ValidAnagram {
 
     // ==========================================
     // 1. BRUTE FORCE / SORTING APPROACH

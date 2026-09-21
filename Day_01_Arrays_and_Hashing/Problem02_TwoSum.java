@@ -9,7 +9,7 @@ import java.util.Map;
  * Question: Given an integer array and a target, determine whether two different elements sum to the target.
  * (Returns indices or boolean indicator)
  */
-public class Problem2_TwoSum {
+public class Problem02_TwoSum {
 
     // ==========================================
     // 1. BRUTE FORCE APPROACH (Nested Loops)

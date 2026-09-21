@@ -9,7 +9,7 @@ import java.util.Map;
  * Return index (0-indexed) or character. Returns -1 / '\0' if no unique
  * character exists.
  */
-public class Problem5_FirstUniqueCharacter {
+public class Problem05_FirstUniqueCharacter {
 
     // ==========================================
     // 1. BRUTE FORCE APPROACH (Nested Loops)

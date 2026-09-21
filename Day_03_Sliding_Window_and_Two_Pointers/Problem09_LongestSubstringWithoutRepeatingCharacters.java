@@ -8,7 +8,7 @@ import java.util.Set;
  * Day 3 - Problem 9: Longest Substring Without Repeating Characters
  * Question: Given a string s, find the length of the longest substring containing no repeating characters.
  */
-public class Problem9_LongestSubstringWithoutRepeatingCharacters {
+public class Problem09_LongestSubstringWithoutRepeatingCharacters {
 
     // ==========================================
     // 1. BRUTE FORCE APPROACH

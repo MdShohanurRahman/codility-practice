@@ -5,7 +5,7 @@ package Day_01_Arrays_and_Hashing;
  * Question: Find the maximum value of A[j] - A[i] where j > i.
  * (If array is non-increasing or length < 2, handles accordingly)
  */
-public class Problem3_MaximumDifference {
+public class Problem03_MaximumDifference {
 
     // ==========================================
     // 1. BRUTE FORCE APPROACH (Nested Loops)
