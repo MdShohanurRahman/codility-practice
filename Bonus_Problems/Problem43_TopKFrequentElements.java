@@ -17,7 +17,8 @@ public class Problem43_TopKFrequentElements {
     // Space Complexity: O(N + K)
     // ==========================================
     public static int[] topKFrequentMinHeap(int[] nums, int k) {
-        if (nums == null || nums.length == 0 || k <= 0) return new int[0];
+        if (nums == null || nums.length == 0 || k <= 0)
+            return new int[0];
 
         Map<Integer, Integer> countMap = new HashMap<>();
         for (int num : nums) {
@@ -25,8 +26,8 @@ public class Problem43_TopKFrequentElements {
         }
 
         // Min-Heap ordered by frequency (ascending)
-        PriorityQueue<Map.Entry<Integer, Integer>> minHeap = 
-            new PriorityQueue<>(Comparator.comparingInt(Map.Entry::getValue));
+        PriorityQueue<Map.Entry<Integer, Integer>> minHeap = new PriorityQueue<>(
+                Comparator.comparingInt(Map.Entry::getValue));
 
         for (Map.Entry<Integer, Integer> entry : countMap.entrySet()) {
             minHeap.offer(entry);
@@ -47,12 +48,14 @@ public class Problem43_TopKFrequentElements {
     // ==========================================
     // 2. OPTIMAL BUCKET SORT APPROACH
     // Group numbers into buckets based on frequency (frequency ranges from 1 to N).
-    // Collect elements starting from frequency N down to 1 until K elements are selected.
+    // Collect elements starting from frequency N down to 1 until K elements are
+    // selected.
     // Time Complexity: O(N) linear time
     // Space Complexity: O(N) auxiliary space
     // ==========================================
     public static int[] topKFrequentBucketSort(int[] nums, int k) {
-        if (nums == null || nums.length == 0 || k <= 0) return new int[0];
+        if (nums == null || nums.length == 0 || k <= 0)
+            return new int[0];
 
         int n = nums.length;
         Map<Integer, Integer> countMap = new HashMap<>();
@@ -80,8 +83,33 @@ public class Problem43_TopKFrequentElements {
         for (int freq = n; freq >= 1 && idx < k; freq--) {
             for (int num : buckets[freq]) {
                 result[idx++] = num;
-                if (idx == k) break;
+                if (idx == k)
+                    break;
             }
+        }
+
+        return result;
+    }
+
+    public static int[] topKFrequent(int[] nums, int k) {
+
+        // 1. Count frequency
+        Map<Integer, Integer> freq = new HashMap<>();
+
+        for (int num : nums) {
+            freq.put(num, freq.getOrDefault(num, 0) + 1);
+        }
+
+        // 2. Sort numbers by frequency
+        List<Integer> numbers = new ArrayList<>(freq.keySet());
+
+        numbers.sort((a, b) -> freq.get(b) - freq.get(a));
+
+        // 3. Take first k
+        int[] result = new int[k];
+
+        for (int i = 0; i < k; i++) {
+            result[i] = numbers.get(i);
         }
 
         return result;
@@ -89,13 +117,13 @@ public class Problem43_TopKFrequentElements {
 
     // Quick Test / Demo
     public static void main(String[] args) {
-        int[] nums1 = {1, 1, 1, 2, 2, 3};
+        int[] nums1 = { 1, 1, 1, 2, 2, 3 };
         int k1 = 2; // Expected: [1, 2]
 
-        int[] nums2 = {1};
+        int[] nums2 = { 1 };
         int k2 = 1; // Expected: [1]
 
-        int[] nums3 = {4, 4, 4, 6, 6, 7, 7, 7, 7, 9};
+        int[] nums3 = { 4, 4, 4, 6, 6, 7, 7, 7, 7, 9 };
         int k3 = 2; // Expected: [7, 4]
 
         System.out.println("--- Bonus Problem 43: Top K Frequent Elements ---");

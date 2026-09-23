@@ -199,6 +199,41 @@ public static int maxSubArrayOptimal(int[] nums) {
 }
 ```
 
+#### solution with subarray 
+```java
+public static int[] maxSubArrayWithRange(int[] nums) {
+    if (nums == null || nums.length == 0) {
+        return new int[0];
+    }
+
+    int currentSum = nums[0];
+    int maxSum = nums[0];
+
+    int start = 0;
+    int end = 0;
+
+    int currentStart = 0;
+
+    for (int i = 1; i < nums.length; i++) {
+
+        if (nums[i] > currentSum + nums[i]) {
+            currentSum = nums[i];
+            currentStart = i;
+        } else {
+            currentSum += nums[i];
+        }
+
+        if (currentSum > maxSum) {
+            maxSum = currentSum;
+            start = currentStart;
+            end = i;
+        }
+    }
+
+    return new int[]{start, end, maxSum};
+}
+```
+
 #### Complexity Analysis
 - **Time Complexity:** $\mathcal{O}(N)$ linear time.
 - **Space Complexity:** $\mathcal{O}(1)$ auxiliary space.
@@ -272,6 +307,32 @@ Given an integer array `nums` and an integer `k`, return the `k` **most frequent
 
 #### Java Code
 ```java
+// solution:1 sorting (not optimal) O(n log n)
+public static int[] topKFrequent(int[] nums, int k) {
+
+    // 1. Count frequency
+    Map<Integer, Integer> freq = new HashMap<>();
+
+    for (int num : nums) {
+        freq.put(num, freq.getOrDefault(num, 0) + 1);
+    }
+
+    // 2. Sort numbers by frequency
+    List<Integer> numbers = new ArrayList<>(freq.keySet());
+
+    numbers.sort((a, b) -> freq.get(b) - freq.get(a));
+
+    // 3. Take first k
+    int[] result = new int[k];
+
+    for (int i = 0; i < k; i++) {
+        result[i] = numbers.get(i);
+    }
+
+    return result;
+}
+
+// solution:2 bucket sort (optimal) O(n)
 public static int[] topKFrequentBucketSort(int[] nums, int k) {
     if (nums == null || nums.length == 0 || k <= 0) return new int[0];
 
