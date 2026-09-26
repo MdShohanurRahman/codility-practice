@@ -151,31 +151,61 @@ public static Set<Integer> findDuplicatesStream(List<Integer> list) {
 ```java
 class Employee {
     private String name;
+    private String department;
     private double salary;
 
-    public Employee(String name, double salary) {
+    public Employee(String name, String department, double salary) {
         this.name = name;
+        this.department = department;
         this.salary = salary;
     }
     public String getName() { return name; }
+    public String getDepartment() { return department; }
     public double getSalary() { return salary; }
+
+    @Override
+    public String toString() {
+        return name + " (" + department + ", $" + salary + ")";
+    }
 }
 ```
 
-### Solutions
+### Sample Input Data
 ```java
-List<Employee> employees = getEmployees();
+List<Employee> employees = List.of(
+    new Employee("Alice", "IT", 75000.0),
+    new Employee("Bob", "HR", 50000.0),
+    new Employee("Charlie", "IT", 90000.0),
+    new Employee("David", "Finance", 50000.0),
+    new Employee("Eve", "HR", 65000.0)
+);
+```
 
-// Ascending Order by Salary
+### Complete Code & Solutions
+```java
+// 1. Ascending Order by Salary (Tie-breaker by Name)
 List<Employee> sortedAsc = employees.stream()
-        .sorted(Comparator.comparingDouble(Employee::getSalary))
+        .sorted(Comparator.comparingDouble(Employee::getSalary)
+                .thenComparing(Employee::getName))
         .collect(Collectors.toList());
 
-// Descending Order by Salary (Then by Name if salaries equal)
+// 2. Descending Order by Salary (Tie-breaker by Name)
 List<Employee> sortedDesc = employees.stream()
         .sorted(Comparator.comparingDouble(Employee::getSalary).reversed()
                 .thenComparing(Employee::getName))
         .collect(Collectors.toList());
+```
+
+### Sample Output
+
+**Ascending Order Output:**
+```text
+[Bob (HR, $50000.0), David (Finance, $50000.0), Eve (HR, $65000.0), Alice (IT, $75000.0), Charlie (IT, $90000.0)]
+```
+
+**Descending Order Output:**
+```text
+[Charlie (IT, $90000.0), Alice (IT, $75000.0), Eve (HR, $65000.0), Bob (HR, $50000.0), David (Finance, $50000.0)]
 ```
 
 ---
@@ -197,6 +227,11 @@ public static Optional<Double> getSecondHighestSalary(List<Employee> employees) 
 }
 ```
 
+**Sample Output:**
+```text
+Optional[75000.0]
+```
+
 ---
 
 ## 07. Group Employees by Department
@@ -206,15 +241,17 @@ Group employees by department name into a `Map<String, List<Employee>>`.
 
 ### Solution
 ```java
-class EmployeeWithDept {
-    String name;
-    String department;
-    double salary;
-    // Getters & Constructors...
-}
+Map<String, List<Employee>> empByDept = employees.stream()
+        .collect(Collectors.groupingBy(Employee::getDepartment));
+```
 
-Map<String, List<EmployeeWithDept>> empByDept = employees.stream()
-        .collect(Collectors.groupingBy(EmployeeWithDept::getDepartment));
+**Sample Output:**
+```text
+{
+  IT=[Alice (IT, $75000.0), Charlie (IT, $90000.0)], 
+  HR=[Bob (HR, $50000.0), Eve (HR, $65000.0)], 
+  Finance=[David (Finance, $50000.0)]
+}
 ```
 
 ---
@@ -225,9 +262,14 @@ Map<String, List<EmployeeWithDept>> empByDept = employees.stream()
 ```java
 Map<String, Long> countByDept = employees.stream()
         .collect(Collectors.groupingBy(
-                EmployeeWithDept::getDepartment,
+                Employee::getDepartment,
                 Collectors.counting()
         ));
+```
+
+**Sample Output:**
+```text
+{IT=2, HR=2, Finance=1}
 ```
 
 ---
@@ -236,21 +278,23 @@ Map<String, Long> countByDept = employees.stream()
 
 ### Solution
 ```java
-Map<String, Optional<EmployeeWithDept>> topPaidPerDept = employees.stream()
+Map<String, Employee> topPaidPerDept = employees.stream()
         .collect(Collectors.groupingBy(
-                EmployeeWithDept::getDepartment,
-                Collectors.maxBy(Comparator.comparingDouble(EmployeeWithDept::getSalary))
-        ));
-
-// Unwrap Optional using collectingAndThen
-Map<String, EmployeeWithDept> topPaidClean = employees.stream()
-        .collect(Collectors.groupingBy(
-                EmployeeWithDept::getDepartment,
+                Employee::getDepartment,
                 Collectors.collectingAndThen(
-                        Collectors.maxBy(Comparator.comparingDouble(EmployeeWithDept::getSalary)),
-                        Optional::get
+                        Collectors.maxBy(Comparator.comparingDouble(Employee::getSalary)), // what 
+                        Optional::get // then
                 )
         ));
+```
+
+**Sample Output:**
+```text
+{
+  IT=Charlie (IT, $90000.0), 
+  HR=Eve (HR, $65000.0), 
+  Finance=David (Finance, $50000.0)
+}
 ```
 
 ---
@@ -259,12 +303,18 @@ Map<String, EmployeeWithDept> topPaidClean = employees.stream()
 
 ### Solution
 ```java
-// Split into two groups: High earners (>= 5000) and Normal earners (< 5000)
-Map<Boolean, List<EmployeeWithDept>> partitioned = employees.stream()
-        .collect(Collectors.partitioningBy(e -> e.getSalary() >= 5000));
+// Split into two groups: High earners (>= 60000) and Normal earners (< 60000)
+Map<Boolean, List<Employee>> partitioned = employees.stream()
+        .collect(Collectors.partitioningBy(e -> e.getSalary() >= 60000.0));
 
-List<EmployeeWithDept> highEarners = partitioned.get(true);
-List<EmployeeWithDept> lowEarners = partitioned.get(false);
+List<Employee> highEarners = partitioned.get(true);
+List<Employee> lowEarners = partitioned.get(false);
+```
+
+**Sample Output:**
+```text
+High Earners (true)  : [Alice (IT, $75000.0), Charlie (IT, $90000.0), Eve (HR, $65000.0)]
+Normal Earners (false): [Bob (HR, $50000.0), David (Finance, $50000.0)]
 ```
 
 ---
@@ -337,7 +387,7 @@ public final class ImmutableEmployee {
 
     // Defensive Copy in Getter
     public List<String> getSkills() {
-        return new ArrayList<>(skills); // Return copy, not internal reference
+        return Collections.unmodifiableList(skills); 
     }
 }
 ```
@@ -515,6 +565,7 @@ public class RetryUtils {
 ---
 
 ## 19. Simple LRU Cache
+**Least Recently Used**
 
 ### Solution using `LinkedHashMap`
 ```java
@@ -576,3 +627,374 @@ public enum EnumSingleton {
     public void doSomething() {}
 }
 ```
+
+---
+
+## 21. Builder Design Pattern (Fluent API & Immutability)
+
+### Problem Statement
+Implement a `User` class using the Builder Pattern to create complex immutable objects safely without telescoping constructors.
+
+### Solution
+```java
+public final class User {
+    private final String firstName; // Required
+    private final String lastName;  // Required
+    private final String email;     // Optional
+    private final int age;          // Optional
+
+    private User(UserBuilder builder) {
+        this.firstName = builder.firstName;
+        this.lastName = builder.lastName;
+        this.email = builder.email;
+        this.age = builder.age;
+    }
+
+    public String getFirstName() { return firstName; }
+    public String getLastName() { return lastName; }
+    public String getEmail() { return email; }
+    public int getAge() { return age; }
+
+    @Override
+    public String toString() {
+        return "User{" + firstName + " " + lastName + ", email='" + email + "', age=" + age + '}';
+    }
+
+    // Static Inner Builder Class
+    public static class UserBuilder {
+        private final String firstName; // Required
+        private final String lastName;  // Required
+        private String email;           // Optional
+        private int age;                // Optional
+
+        public UserBuilder(String firstName, String lastName) {
+            if (firstName == null || lastName == null) {
+                throw new IllegalArgumentException("First name and Last name are required!");
+            }
+            this.firstName = firstName;
+            this.lastName = lastName;
+        }
+
+        public UserBuilder email(String email) {
+            this.email = email;
+            return this; // Fluent API
+        }
+
+        public UserBuilder age(int age) {
+            this.age = age;
+            return this; // Fluent API
+        }
+
+        public User build() {
+            return new User(this);
+        }
+    }
+}
+```
+
+### Usage & Output
+```java
+User user = new User.UserBuilder("John", "Doe")
+        .email("john.doe@example.com")
+        .age(30)
+        .build();
+
+System.out.println(user);
+// Output: User{John Doe, email='john.doe@example.com', age=30}
+```
+
+---
+
+## 22. Shallow Copy vs Deep Copy
+
+### Problem Statement
+Demonstrate the difference between Shallow Copy and Deep Copy when an object contains a mutable reference (e.g. `Address`).
+
+### Solution
+```java
+class Address implements Cloneable {
+    String city;
+    public Address(String city) { this.city = city; }
+    
+    // Copy Constructor for Address
+    public Address(Address other) { this.city = other.city; }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+}
+
+class Person implements Cloneable {
+    String name;
+    Address address;
+
+    public Person(String name, Address address) {
+        this.name = name;
+        this.address = address;
+    }
+
+    // 1. Shallow Copy Constructor
+    public Person shallowCopy() {
+        return new Person(this.name, this.address); // Shares address reference!
+    }
+
+    // 2. Deep Copy Constructor (Recommended over clone())
+    public Person deepCopy() {
+        return new Person(this.name, new Address(this.address)); // Creates new Address object!
+    }
+}
+```
+
+### Demo & Explanation
+```java
+Address addr = new Address("Dhaka");
+Person p1 = new Person("Rahim", addr);
+
+// Shallow Copy Demo
+Person shallowP = p1.shallowCopy();
+shallowP.address.city = "Chittagong"; 
+// p1.address.city also becomes "Chittagong"! (SHARED REFERENCE)
+
+// Deep Copy Demo
+Person deepP = p1.deepCopy();
+deepP.address.city = "Sylhet"; 
+// p1.address.city remains "Chittagong"! (INDEPENDENT OBJECT)
+```
+
+---
+
+## 23. Strategy & Factory Pattern (Polymorphism & SOLID)
+
+### Problem Statement
+Implement a flexible Payment System where new payment strategies (CreditCard, PayPal, Crypto) can be added without modifying existing processing logic (Open/Closed Principle).
+
+### Solution
+```java
+// 1. Strategy Interface
+public interface PaymentStrategy {
+    void pay(double amount);
+}
+
+// 2. Concrete Strategies
+public class CreditCardPayment implements PaymentStrategy {
+    private String cardNumber;
+    public CreditCardPayment(String cardNumber) { this.cardNumber = cardNumber; }
+
+    @Override
+    public void pay(double amount) {
+        System.out.println("Paid $" + amount + " using Credit Card ending in " + cardNumber.substring(cardNumber.length() - 4));
+    }
+}
+
+public class PaypalPayment implements PaymentStrategy {
+    private String email;
+    public PaypalPayment(String email) { this.email = email; }
+
+    @Override
+    public void pay(double amount) {
+        System.out.println("Paid $" + amount + " using PayPal account: " + email);
+    }
+}
+
+// 3. Factory Class
+public class PaymentFactory {
+    public static PaymentStrategy getPaymentMethod(String type, String detail) {
+        if ("CREDIT".equalsIgnoreCase(type)) {
+            return new CreditCardPayment(detail);
+        } else if ("PAYPAL".equalsIgnoreCase(type)) {
+            return new PaypalPayment(detail);
+        }
+        throw new IllegalArgumentException("Unknown payment type: " + type);
+    }
+}
+```
+
+### Usage
+```java
+PaymentStrategy strategy = PaymentFactory.getPaymentMethod("PAYPAL", "user@example.com");
+strategy.pay(150.0);
+// Output: Paid $150.0 using PayPal account: user@example.com
+```
+
+---
+
+## 24. Abstract Class vs Interface (with Java 8+ Default/Static Methods)
+
+### Key Differences Comparison Table
+
+| Feature | Abstract Class | Interface (Java 8+) |
+| :--- | :--- | :--- |
+| **State / Fields** | Can have instance fields (`private int id;`) | Only `public static final` constants |
+| **Constructors** | Can have constructors | No constructors |
+| **Multiple Inheritance**| Single class inheritance (`extends`) | Multiple interface implementation (`implements`) |
+| **Default Methods** | Regular non-abstract methods | Supported via `default` keyword |
+
+### Demonstration
+```java
+// Interface with Default & Static Methods
+interface Loggable {
+    void log(String message); // Abstract
+
+    default void logInfo(String info) {
+        log("[INFO]: " + info); // Default method
+    }
+
+    static void logGlobal(String sysMsg) {
+        System.out.println("[SYSTEM GLOBAL]: " + sysMsg); // Static method
+    }
+}
+
+// Abstract Class holding Shared State
+abstract class BaseEntity {
+    private final String id = UUID.randomUUID().toString();
+    private final long createdAt = System.currentTimeMillis();
+
+    public String getId() { return id; }
+    public long getCreatedAt() { return createdAt; }
+
+    public abstract void process();
+}
+
+// Concrete Implementation extending Abstract Class & implementing Interface
+class OrderProcessor extends BaseEntity implements Loggable {
+    @Override
+    public void process() {
+        logInfo("Processing order ID: " + getId());
+    }
+
+    @Override
+    public void log(String message) {
+        System.out.println(message);
+    }
+}
+```
+
+---
+
+## 25. Tricky OOP Pitfalls & Edge Cases
+
+This problem covers the 5 most confusing OOP traps that interviewers use to test deep Java runtime knowledge.
+
+---
+
+### 1. Method Hiding vs Method Overriding (`static` Methods)
+**Question:** What happens when a subclass defines a `static` method with the exact same signature as a `static` method in the superclass?
+
+```java
+class Parent {
+    public static void display() { System.out.println("Parent static display"); }
+    public void print() { System.out.println("Parent instance print"); }
+}
+
+class Child extends Parent {
+    public static void display() { System.out.println("Child static display"); } // Method Hiding!
+    @Override
+    public void print() { System.out.println("Child instance print"); }         // Method Overriding!
+}
+
+// Test Code:
+Parent p = new Child();
+p.display(); // Prints: "Parent static display" (Static Binding based on Reference Type!)
+p.print();   // Prints: "Child instance print"  (Dynamic Binding based on Object Type!)
+```
+- **Rule:** `static` methods **cannot** be overridden; they are **hidden**. Resolution is determined at compile-time by the reference variable type (`Parent`), not the actual instance object (`Child`).
+
+---
+
+### 2. Overloading Ambiguity with `null` Arguments
+**Question:** Which overloaded method is called when passing `null`?
+
+```java
+public class OverloadTest {
+    public static void test(Object o) { System.out.println("Object overload"); }
+    public static void test(String s) { System.out.println("String overload"); }
+    public static void test(Integer i) { System.out.println("Integer overload"); }
+
+    public static void main(String[] args) {
+        // test(null); // COMPILE ERROR! Ambiguous method call (String vs Integer are equally specific)
+    }
+}
+
+// Fixed Case (Unambiguous inheritance hierarchy):
+public class UnambiguousTest {
+    public static void show(Object o) { System.out.println("Object"); }
+    public static void show(String s) { System.out.println("String"); }
+
+    public static void main(String[] args) {
+        show(null); // Prints: "String" (Java chooses the MOST SPECIFIC subtype in hierarchy!)
+    }
+}
+```
+- **Rule:** Compiler picks the **most specific subtype** matching the argument. `String` is a subtype of `Object`, so `String` wins. But if two siblings (`String` vs `Integer`) exist, it results in a compile-time ambiguity error.
+
+---
+
+### 3. Fields are NOT Polymorphic (Field Shadowing / Hiding)
+**Question:** Does variable access use dynamic method dispatch?
+
+```java
+class SuperClass {
+    int x = 10;
+}
+
+class SubClass extends SuperClass {
+    int x = 20; // Shadowing superclass field
+}
+
+// Test Code:
+SuperClass obj = new SubClass();
+System.out.println(obj.x); // Prints: 10 ! (NOT 20)
+```
+- **Rule:** Polymorphism applies **ONLY to non-static instance methods**, NOT to instance fields or static fields. Field access is resolved at compile time based on the reference type.
+
+---
+
+### 4. Covariant Return Types in Overriding
+**Question:** Can an overriding method return a different type than the superclass method?
+
+```java
+class A {}
+class B extends A {}
+
+class ParentClass {
+    public A getObject() { return new A(); }
+}
+
+class ChildClass extends ParentClass {
+    @Override
+    public B getObject() { return new B(); } // Valid! Covariant Return Type
+}
+```
+- **Rule:** Since Java 5, an overriding method is allowed to return a **subtype** (covariant type) of the return type declared in the superclass method.
+
+---
+
+### 5. Overriding & Checked Exception Constraints
+**Question:** What exception rules apply when overriding a method?
+
+```java
+class ParentService {
+    public void execute() throws IOException { }
+}
+
+class ChildService1 extends ParentService {
+    @Override
+    public void execute() throws FileNotFoundException { } // VALID: Subclass exception of IOException
+}
+
+class ChildService2 extends ParentService {
+    @Override
+    public void execute() { } // VALID: Throwing NO exception is allowed
+}
+
+/* 
+class ChildService3 extends ParentService {
+    @Override
+    public void execute() throws Exception { } // COMPILE ERROR! Broader checked exception not allowed!
+}
+*/
+```
+- **Rule:** An overridden method **cannot** declare new or broader Checked Exceptions than the superclass method. It can only declare the same, narrower (subclass), or no Checked Exceptions. (Unchecked exceptions like `RuntimeException` are ignored by this rule).
+
+

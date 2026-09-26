@@ -6,7 +6,7 @@ Welcome to your EPAM Technical Interview Practice Dashboard! Use this checklist 
 
 ## 📂 Quick File Navigation
 
-- ☕ **[Part 1: Core Java Guide (20 Problems)](01_core_java.md)** — Streams, Collections, Concurrency, & Design Patterns.
+- ☕ **[Part 1: Core Java Guide (25 Problems)](01_core_java.md)** — Streams, Collections, Concurrency, & Design Patterns.
 - ⚡ **[Part 2: DSA Master Guide (15 Problems)](02_dsa.md)** — Detailed Explanations with Brute Force ➔ Optimal Solutions.
 - 🗄️ **[Part 3: SQL Queries Guide (15 Problems)](03_sql.md)** — Window Functions, JOINs, CTEs, & Grouping.
 
@@ -22,7 +22,7 @@ Whenever you practice or explain a problem in an interview, speak in these 5 ste
 
 ---
 
-## ☕ Core Java Practice Checklist (20 Problems)
+## ☕ Core Java Practice Checklist (25 Problems)
 
 | Status | # | Problem | Key Concept | Priority |
 | :---: | :---: | :--- | :--- | :---: |
@@ -46,6 +46,11 @@ Whenever you practice or explain a problem in an interview, speak in these 5 ste
 | [ ] | 18 | [Retry Mechanism](01_core_java.md#18-retry-mechanism-with-exponential-backoff) | Exponential Backoff | 🔴 High |
 | [ ] | 19 | [Simple LRU Cache](01_core_java.md#19-simple-lru-cache) | `LinkedHashMap(accessOrder=true)` | 🟡 Med |
 | [ ] | 20 | [Thread-Safe Singleton](01_core_java.md#20-thread-safe-singleton-implementations) | Bill Pugh Helper Class / Enum | 🔴 High |
+| [ ] | 21 | [Builder Design Pattern](01_core_java.md#21-builder-design-pattern-fluent-api--immutability) | Fluent API, Static Inner Builder | 🔴 High |
+| [ ] | 22 | [Shallow Copy vs Deep Copy](01_core_java.md#22-shallow-copy-vs-deep-copy) | Copy Constructor, Memory State | 🔴 High |
+| [ ] | 23 | [Strategy & Factory Pattern](01_core_java.md#23-strategy--factory-pattern-polymorphism--solid) | Runtime Polymorphism, Open/Closed | 🔴 High |
+| [ ] | 24 | [Abstract Class vs Interface](01_core_java.md#24-abstract-class-vs-interface-with-java-8-defaultstatic-methods) | Shared State vs `default` methods | 🔴 High |
+| [ ] | 25 | [Custom Exception Hierarchy](01_core_java.md#25-custom-exception-hierarchy-design) | Base Unchecked Domain Error | 🔴 High |
 
 ---
 
